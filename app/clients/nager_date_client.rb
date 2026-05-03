@@ -17,6 +17,10 @@ class NagerDateClient
     get("/api/v3/PublicHolidays/#{year}/#{country_code}")
   end
 
+  def available_countries
+    get("/api/v3/AvailableCountries")
+  end
+
   private
 
   def get(path)
