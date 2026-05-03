@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   # get "offline" => "rails/pwa#offline", as: :pwa_offline
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  get "/:country_code", to: "countries#show",
+                        as: :country,
+                        constraints: { country_code: /[A-Za-z]{2}/ }
 end
