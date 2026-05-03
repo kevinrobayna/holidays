@@ -64,4 +64,20 @@ class IpCountryLookupTest < ActiveSupport::TestCase
   test "returns nil when reader is nil (database missing)" do
     assert_nil IpCountryLookup.new(reader: nil).call("8.8.8.8")
   end
+
+  test "build_reader returns nil for blank path" do
+    assert_nil IpCountryLookup.build_reader(nil)
+    assert_nil IpCountryLookup.build_reader("")
+  end
+
+  test "build_reader returns nil when file is missing" do
+    missing = Rails.root.join("tmp", "definitely-not-here-#{SecureRandom.hex(4)}.mmdb").to_s
+    assert_nil IpCountryLookup.build_reader(missing)
+  end
+
+  test "boot wires Rails config without raising when database is missing" do
+    assert Rails.application.config.x.maxmind_db_path.is_a?(String)
+    assert_nil Rails.application.config.x.maxmind_reader
+    assert_nil IpCountryLookup.call("8.8.8.8")
+  end
 end

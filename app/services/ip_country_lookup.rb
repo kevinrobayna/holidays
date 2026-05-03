@@ -2,15 +2,15 @@ require "ipaddr"
 
 class IpCountryLookup
   def self.call(ip)
-    instance.call(ip)
+    new.call(ip)
   end
 
-  def self.instance
-    @instance ||= new
-  end
-
-  def self.reset!
-    @instance = nil
+  def self.build_reader(path)
+    return nil if path.blank?
+    return nil unless File.exist?(path)
+    MaxMind::GeoIP2::Reader.new(database: path)
+  rescue Errno::ENOENT, MaxMind::DB::InvalidDatabaseError
+    nil
   end
 
   def initialize(reader: Rails.configuration.x.maxmind_reader)
