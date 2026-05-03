@@ -38,3 +38,6 @@
 !/app/assets/builds/.keep
 
 /node_modules
+
+# MaxMind GeoIP databases — downloaded by `bin/rails maxmind:download`
+/vendor/maxmind/*.mmdb
