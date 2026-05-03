@@ -52,4 +52,47 @@ class NagerDateClientTest < ActiveSupport::TestCase
     end
     assert_requested(stub, times: 1)
   end
+
+  AVAILABLE_COUNTRIES_ENDPOINT = "https://date.nager.at/api/v3/AvailableCountries"
+
+  test "available_countries returns parsed array on success" do
+    body = [
+      { "countryCode" => "AD", "name" => "Andorra" },
+      { "countryCode" => "ES", "name" => "Spain" }
+    ]
+    stub = stub_request(:get, AVAILABLE_COUNTRIES_ENDPOINT)
+      .to_return(status: 200, body: body.to_json, headers: { "Content-Type" => "application/json" })
+
+    result = NagerDateClient.new.available_countries
+
+    assert_equal body, result
+    assert_requested(stub, times: 1)
+  end
+
+  test "available_countries retries transient 503 then succeeds" do
+    stub = stub_request(:get, AVAILABLE_COUNTRIES_ENDPOINT)
+      .to_return({ status: 503, body: "" }, { status: 503, body: "" }, { status: 200, body: "[]", headers: { "Content-Type" => "application/json" } })
+
+    result = NagerDateClient.new.available_countries
+
+    assert_equal [], result
+    assert_requested(stub, times: 3)
+  end
+
+  test "available_countries raises after retries exhausted on persistent 503" do
+    stub_request(:get, AVAILABLE_COUNTRIES_ENDPOINT).to_return(status: 503, body: "")
+
+    assert_raises(NagerDateClient::Error) do
+      NagerDateClient.new.available_countries
+    end
+  end
+
+  test "available_countries raises immediately on 500 without retrying when not transient" do
+    stub = stub_request(:get, AVAILABLE_COUNTRIES_ENDPOINT).to_return(status: 400, body: "{}", headers: { "Content-Type" => "application/json" })
+
+    assert_raises(NagerDateClient::Error) do
+      NagerDateClient.new.available_countries
+    end
+    assert_requested(stub, times: 1)
+  end
 end
