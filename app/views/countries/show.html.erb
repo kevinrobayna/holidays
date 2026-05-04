@@ -1,2 +1,54 @@
-<h1>Country: <%= @country_code %></h1>
-<p>Holiday data for this country will live here.</p>
+<% content_for :title, "Public holidays in #{@country.name} (#{@year})" %>
+
+<header class="mx-auto max-w-7xl px-4 py-8">
+  <h1 class="text-3xl font-semibold text-gray-900">
+    Public holidays in <%= @country.name %>
+  </h1>
+
+  <nav class="mt-3 flex items-center gap-3 text-sm" aria-label="Year navigation">
+    <% prev_year = @year - 1 %>
+    <% if HolidayFetcher::YEAR_RANGE.cover?(prev_year) %>
+      <%= link_to "« #{prev_year}",
+                  country_path(country_code: @country_code.downcase, year: prev_year),
+                  class: "rounded border border-gray-300 px-3 py-1 hover:bg-gray-50",
+                  rel: "prev" %>
+    <% end %>
+
+    <span class="text-lg font-medium text-gray-700"><%= @year %></span>
+
+    <% next_year = @year + 1 %>
+    <% if HolidayFetcher::YEAR_RANGE.cover?(next_year) %>
+      <%= link_to "#{next_year} »",
+                  country_path(country_code: @country_code.downcase, year: next_year),
+                  class: "rounded border border-gray-300 px-3 py-1 hover:bg-gray-50",
+                  rel: "next" %>
+    <% end %>
+  </nav>
+</header>
+
+<section class="mx-auto max-w-7xl px-4 pb-12">
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <% (1..12).each do |month| %>
+      <%= render "month", year: @year, month: month, holidays_by_date: @holidays_by_date %>
+    <% end %>
+  </div>
+</section>
+
+<% if @holidays.any? %>
+  <section class="mx-auto max-w-7xl px-4 pb-16">
+    <h2 class="text-xl font-semibold text-gray-900">Holidays in <%= @year %></h2>
+    <ul class="mt-4 divide-y divide-gray-200 rounded border border-gray-200 bg-white">
+      <% @holidays.sort_by(&:date).each do |holiday| %>
+        <li class="flex flex-wrap items-baseline gap-x-4 px-4 py-3">
+          <span class="w-32 shrink-0 font-mono text-sm text-gray-600">
+            <%= I18n.l(holiday.date, format: "%a %b %-d") %>
+          </span>
+          <span class="font-medium text-gray-900"><%= holiday.local_name %></span>
+          <% if holiday.name.present? && holiday.name != holiday.local_name %>
+            <span class="text-sm text-gray-500"><%= holiday.name %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

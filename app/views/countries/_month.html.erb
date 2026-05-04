@@ -1,0 +1,27 @@
+<% weeks = month_weeks(year, month) %>
+<% first_of_month = Date.new(year, month, 1) %>
+
+<article class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+  <h3 class="mb-3 text-base font-semibold text-gray-900">
+    <%= I18n.l(first_of_month, format: "%B") %>
+  </h3>
+
+  <div class="grid grid-cols-7 gap-1 text-center text-xs">
+    <% %w[Mo Tu We Th Fr Sa Su].each do |label| %>
+      <div class="py-1 font-medium uppercase tracking-wide text-gray-400"><%= label %></div>
+    <% end %>
+
+    <% weeks.flatten.each do |date| %>
+      <% in_month = date.month == month %>
+      <% holidays = holidays_by_date[date] %>
+      <div
+        class="aspect-square rounded text-sm flex items-center justify-center
+               <%= in_month ? 'text-gray-900' : 'text-gray-300' %>
+               <%= holidays && in_month ? 'bg-amber-100 font-semibold ring-1 ring-amber-300' : '' %>"
+        <% if holidays && in_month %>title="<%= holidays.map(&:local_name).join(' • ') %>"<% end %>
+      >
+        <%= date.day %>
+      </div>
+    <% end %>
+  </div>
+</article>
