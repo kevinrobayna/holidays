@@ -74,4 +74,8 @@ group :test do
 
   # Stub external HTTP requests in tests
   gem "webmock"
+
+  # Run axe-core a11y audits against rendered pages in system tests
+  gem "axe-core-api"
+  gem "axe-core-capybara"
 end
