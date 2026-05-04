@@ -6,9 +6,9 @@
     <%= I18n.l(first_of_month, format: "%B") %>
   </h3>
 
-  <div class="grid grid-cols-7 gap-1 text-center text-xs" role="grid">
+  <div class="grid grid-cols-7 gap-1 text-center text-xs">
     <% %w[Mo Tu We Th Fr Sa Su].each do |label| %>
-      <div class="py-1 font-medium uppercase tracking-wide text-gray-400" aria-hidden="true"><%= label %></div>
+      <div class="py-1 font-medium uppercase tracking-wide text-gray-500" aria-hidden="true"><%= label %></div>
     <% end %>
 
     <% weeks.flatten.each do |date| %>
@@ -18,7 +18,7 @@
       <time
         datetime="<%= date.iso8601 %>"
         class="aspect-square rounded text-sm flex flex-col items-center justify-center gap-0.5
-               <%= in_month ? 'text-gray-900' : 'text-gray-300' %>
+               <%= in_month ? 'text-gray-900' : 'text-gray-500' %>
                <%= holidays ? 'bg-amber-200 font-semibold ring-1 ring-amber-500' : '' %>"
         <% if holidays %>title="<%= holidays.map(&:local_name).join(' • ') %>"<% end %>
         <% unless in_month %>aria-hidden="true"<% end %>

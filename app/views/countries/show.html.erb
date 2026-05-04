@@ -26,7 +26,8 @@
   </nav>
 </header>
 
-<section class="mx-auto max-w-7xl px-4 pb-12">
+<section class="mx-auto max-w-7xl px-4 pb-12" aria-labelledby="calendar-heading">
+  <h2 id="calendar-heading" class="sr-only">Calendar</h2>
   <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
     <% (1..12).each do |month| %>
       <%= render "month", year: @year, month: month, holidays_by_date: @holidays_by_date %>
