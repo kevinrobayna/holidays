@@ -14,19 +14,19 @@
     <% weeks.flatten.each do |date| %>
       <% in_month = date.month == month %>
       <% holidays = in_month ? holidays_by_date[date] : nil %>
-      <% holiday_label = holidays && "Public holiday: #{holidays.map(&:local_name).join(' • ')}" %>
+      <% holiday_descriptions = holidays&.map { |h| [ h.local_name, holiday_scope_text(h) ].compact.join(" — ") } %>
       <time
         datetime="<%= date.iso8601 %>"
         class="aspect-square rounded text-sm flex flex-col items-center justify-center gap-0.5
                <%= in_month ? 'text-gray-900' : 'text-gray-500' %>
                <%= holidays ? 'bg-amber-200 font-semibold ring-1 ring-amber-500' : '' %>"
-        <% if holidays %>title="<%= holidays.map(&:local_name).join(' • ') %>"<% end %>
+        <% if holiday_descriptions %>title="<%= holiday_descriptions.join(' • ') %>"<% end %>
         <% unless in_month %>aria-hidden="true"<% end %>
       >
         <span><%= date.day %></span>
         <% if holidays %>
           <span class="block h-1 w-1 rounded-full bg-amber-700" aria-hidden="true"></span>
-          <span class="sr-only"><%= holiday_label %></span>
+          <span class="sr-only">Public holiday: <%= holiday_descriptions.join(' • ') %></span>
         <% end %>
       </time>
     <% end %>

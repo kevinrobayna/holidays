@@ -62,4 +62,46 @@ class CalendarHelperTest < ActionView::TestCase
     assert_includes in_feb, Date.new(2024, 2, 29)
     assert_equal 29, in_feb.size
   end
+
+  def build_holiday(global:, counties: nil)
+    Holiday.new(
+      date: Date.new(2026, 1, 1),
+      local_name: "Test",
+      name: "Test",
+      country_code: "GB",
+      fixed: true,
+      global: global,
+      counties: counties,
+      launch_year: nil,
+      types: [ "Public" ]
+    )
+  end
+
+  test "holiday_scope_text returns 'Nationwide' for global holidays" do
+    assert_equal "Nationwide", holiday_scope_text(build_holiday(global: true))
+  end
+
+  test "holiday_scope_text strips ISO 3166-2 country prefix from county codes" do
+    holiday = build_holiday(global: false, counties: [ "GB-ENG", "GB-WLS", "GB-NIR" ])
+
+    assert_equal "Regional: ENG, WLS, NIR", holiday_scope_text(holiday)
+  end
+
+  test "holiday_scope_text leaves county codes without the standard prefix as-is" do
+    holiday = build_holiday(global: false, counties: [ "ENG", "Catalonia" ])
+
+    assert_equal "Regional: ENG, Catalonia", holiday_scope_text(holiday)
+  end
+
+  test "holiday_scope_text returns nil when neither global nor counties are set" do
+    assert_nil holiday_scope_text(build_holiday(global: false, counties: nil))
+    assert_nil holiday_scope_text(build_holiday(global: false, counties: []))
+  end
+
+  test "holiday_scope_text prefers 'Nationwide' over counties when global is true" do
+    # Nager.Date sometimes sends counties even with global=true; global wins.
+    holiday = build_holiday(global: true, counties: [ "GB-ENG" ])
+
+    assert_equal "Nationwide", holiday_scope_text(holiday)
+  end
 end

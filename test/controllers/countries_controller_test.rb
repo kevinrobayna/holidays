@@ -204,4 +204,37 @@ class CountriesControllerTest < ActionDispatch::IntegrationTest
     # Jan 2026 starts on a Thursday, so Mon Dec 29 2025 is a leading padding cell.
     assert_select "time[datetime=?][aria-hidden=true]", "2025-12-29"
   end
+
+  test "chronological list shows scope (Nationwide / Regional) for each holiday" do
+    regional = Holiday.new(
+      date: Date.new(2026, 3, 17),
+      local_name: "St Patrick's Day",
+      name: "St Patrick's Day",
+      country_code: "GB",
+      fixed: true,
+      global: false,
+      counties: [ "GB-NIR" ],
+      launch_year: nil,
+      types: [ "Public" ]
+    )
+
+    with_stubs(holidays: GB_HOLIDAYS + [ regional ]) do
+      get "/gb?year=2026"
+    end
+
+    # New Year's Day is global -> Nationwide
+    assert_select "li", text: /New Year.*Nationwide/m
+    # St Patrick's Day is GB-NIR -> Regional with the country prefix stripped
+    assert_select "li", text: /St Patrick.*Regional: NIR/m
+  end
+
+  test "calendar cell screen-reader label includes the holiday scope" do
+    with_stubs do
+      get "/gb?year=2026"
+    end
+
+    # The grid is decorative, but assistive tech should still get scope info.
+    assert_select "time[datetime=?] span.sr-only", "2026-01-01",
+                  text: /Public holiday: New Year's Day — Nationwide/
+  end
 end
