@@ -6,22 +6,29 @@
     <%= I18n.l(first_of_month, format: "%B") %>
   </h3>
 
-  <div class="grid grid-cols-7 gap-1 text-center text-xs">
+  <div class="grid grid-cols-7 gap-1 text-center text-xs" role="grid">
     <% %w[Mo Tu We Th Fr Sa Su].each do |label| %>
-      <div class="py-1 font-medium uppercase tracking-wide text-gray-400"><%= label %></div>
+      <div class="py-1 font-medium uppercase tracking-wide text-gray-400" aria-hidden="true"><%= label %></div>
     <% end %>
 
     <% weeks.flatten.each do |date| %>
       <% in_month = date.month == month %>
-      <% holidays = holidays_by_date[date] %>
-      <div
-        class="aspect-square rounded text-sm flex items-center justify-center
+      <% holidays = in_month ? holidays_by_date[date] : nil %>
+      <% holiday_label = holidays && "Public holiday: #{holidays.map(&:local_name).join(' • ')}" %>
+      <time
+        datetime="<%= date.iso8601 %>"
+        class="aspect-square rounded text-sm flex flex-col items-center justify-center gap-0.5
                <%= in_month ? 'text-gray-900' : 'text-gray-300' %>
-               <%= holidays && in_month ? 'bg-amber-100 font-semibold ring-1 ring-amber-300' : '' %>"
-        <% if holidays && in_month %>title="<%= holidays.map(&:local_name).join(' • ') %>"<% end %>
+               <%= holidays ? 'bg-amber-200 font-semibold ring-1 ring-amber-500' : '' %>"
+        <% if holidays %>title="<%= holidays.map(&:local_name).join(' • ') %>"<% end %>
+        <% unless in_month %>aria-hidden="true"<% end %>
       >
-        <%= date.day %>
-      </div>
+        <span><%= date.day %></span>
+        <% if holidays %>
+          <span class="block h-1 w-1 rounded-full bg-amber-700" aria-hidden="true"></span>
+          <span class="sr-only"><%= holiday_label %></span>
+        <% end %>
+      </time>
     <% end %>
   </div>
 </article>

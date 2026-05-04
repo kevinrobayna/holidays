@@ -165,4 +165,43 @@ class CountriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_select "a[rel=prev]", false, "prev year link should be hidden at the lower bound"
   end
+
+  test "holiday days are wrapped in a <time> element with a screen-reader label" do
+    with_stubs do
+      get "/gb?year=2026"
+    end
+
+    # Sighted users see the highlighted cell; assistive tech gets the holiday name
+    # via a visually-hidden span so we don't rely on color or `title` alone.
+    assert_select "time[datetime=?]", "2026-01-01"
+    assert_select "time[datetime=?] span.sr-only", "2026-01-01", text: /Public holiday: New Year's Day/
+  end
+
+  test "holiday days carry a non-color (dot) indicator" do
+    with_stubs do
+      get "/gb?year=2026"
+    end
+
+    # The dot is decorative-only (aria-hidden) but provides a visual cue
+    # independent of background color for color-blind users.
+    assert_select "time[datetime=?] span[aria-hidden=true]", "2026-01-01"
+  end
+
+  test "non-holiday days do not carry the dot indicator" do
+    with_stubs do
+      get "/gb?year=2026"
+    end
+
+    assert_select "time[datetime=?] span[aria-hidden=true]", "2026-01-02", count: 0
+    assert_select "time[datetime=?] span.sr-only", "2026-01-02", count: 0
+  end
+
+  test "out-of-month padding cells are aria-hidden" do
+    with_stubs do
+      get "/gb?year=2026"
+    end
+
+    # Jan 2026 starts on a Thursday, so Mon Dec 29 2025 is a leading padding cell.
+    assert_select "time[datetime=?][aria-hidden=true]", "2025-12-29"
+  end
 end
