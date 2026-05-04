@@ -23,7 +23,7 @@ gem "jbuilder"
 gem "faraday"
 gem "faraday-retry"
 
-# Offline IP-to-country lookup using a MaxMind GeoLite2 .mmdb database
+# Offline IP-to-country lookup. Reads .mmdb files (default data source: DB-IP Lite, CC BY 4.0).
 gem "maxmind-geoip2"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]

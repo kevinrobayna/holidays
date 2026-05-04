@@ -13,7 +13,7 @@ class IpCountryLookup
     nil
   end
 
-  def initialize(reader: Rails.configuration.x.maxmind_reader)
+  def initialize(reader: Rails.configuration.x.geoip_reader)
     @reader = reader
   end
 

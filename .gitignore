@@ -39,5 +39,5 @@
 
 /node_modules
 
-# MaxMind GeoIP databases — downloaded by `bin/rails maxmind:download`
-/vendor/maxmind/*.mmdb
+# GeoIP databases — downloaded by `bin/rails geoip:download`
+/vendor/geoip/*.mmdb

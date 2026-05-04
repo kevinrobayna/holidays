@@ -22,3 +22,10 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+
+## Attributions
+
+[IP Geolocation by DB-IP](https://db-ip.com), licensed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The IP-to-country
+lookup uses the free DB-IP Lite Country database, downloaded by
+`bin/rails geoip:download` into `vendor/geoip/`.

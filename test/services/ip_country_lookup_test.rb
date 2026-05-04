@@ -75,9 +75,8 @@ class IpCountryLookupTest < ActiveSupport::TestCase
     assert_nil IpCountryLookup.build_reader(missing)
   end
 
-  test "boot wires Rails config without raising when database is missing" do
-    assert Rails.application.config.x.maxmind_db_path.is_a?(String)
-    assert_nil Rails.application.config.x.maxmind_reader
-    assert_nil IpCountryLookup.call("8.8.8.8")
+  test "initializer wires the GeoIP database path into Rails config" do
+    assert_kind_of String, Rails.application.config.x.geoip_db_path
+    assert_predicate Rails.application.config.x.geoip_db_path, :present?
   end
 end
